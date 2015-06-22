@@ -151,7 +151,7 @@ namespace Streams
             set
             {
                 if (value < 0 || value > _TotalLength)
-                    throw new ArgumentOutOfRangeException("value");
+                     throw new IOException("An attempt was made to move the position before the beginning of the stream.");
 
                 _Position = value;
                 if (value == _TotalLength)
