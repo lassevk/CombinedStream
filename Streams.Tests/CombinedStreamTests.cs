@@ -101,5 +101,24 @@ namespace Streams.Tests
             Assert.That(() => cs.Seek(-4, SeekOrigin.End), throws());
             Assert.That(cs.Position, Is.EqualTo(1));
         }
+
+        [Test]
+        public void CanSeekThroughBoundaryOfLastStream()
+        {
+            var us1 = MemStreamOfBytes(0x1);
+            var us2 = MemStreamOfBytes(0x2);
+            var us3 = MemStreamOfBytes(0x3);
+            var cs = new CombinedStream(us1, us2, us3);
+
+            // seek through last stream
+            Assert.That(cs.Seek(5, SeekOrigin.Begin), Is.EqualTo(5));
+            var buf = new byte[3];
+            Assert.That(cs.Read(buf, 0, 3), Is.EqualTo(0));
+
+            // seek back and read
+            Assert.That(cs.Seek(-4, SeekOrigin.Current), Is.EqualTo(1));
+            Assert.That(cs.Read(buf, 0, 3), Is.EqualTo(2));
+            Assert.That(buf, Is.EqualTo(new[] { 0x2, 0x3, 0x0 }));
+        }
     }
 }
